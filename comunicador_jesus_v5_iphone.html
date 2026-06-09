@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Comunicador Jesús V5 iPhone</title>
+<style>
+  :root{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;background:#f4f7fb;color:#142033}
+  body{margin:0;padding:14px;background:#f4f7fb}
+  .app{max-width:900px;margin:auto}
+  h1{font-size:26px;margin:8px 0 4px}
+  p{margin:4px 0 12px;color:#4d5b6a}
+  .phrase{position:sticky;top:0;background:white;border:3px solid #1f6feb;border-radius:18px;padding:16px;font-size:25px;font-weight:800;min-height:36px;z-index:10;box-shadow:0 6px 20px #0001}
+  .controls,.tabs,.quick,.mode{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin:12px 0}
+  .tabs{grid-template-columns:repeat(2,1fr)}
+  button{font-size:20px;font-weight:750;border:0;border-radius:18px;padding:16px;background:white;box-shadow:0 2px 8px #0002;color:#142033;min-height:62px}
+  button:active{transform:scale(.98);background:#eaf2ff}
+  .primary{background:#1f6feb;color:white}
+  .danger{background:#ffe8e8;color:#8b0000}
+  .ok{background:#e8fff1;color:#064d25}
+  .active{outline:4px solid #1f6feb;background:#eaf2ff}
+  .grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin:12px 0 22px}
+  .tile{min-height:105px;font-size:22px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:8px}
+  .emoji{font-size:42px;line-height:1}
+  .quick{grid-template-columns:1fr}
+  .quick button{text-align:left;font-size:20px}
+  .diary{background:white;border-radius:18px;padding:14px;margin-top:14px;box-shadow:0 2px 8px #0001}
+  .diaryItem{padding:10px;border-bottom:1px solid #e5e7eb;font-size:18px}
+  .small{font-size:15px;color:#667085}
+  @media(min-width:700px){.grid{grid-template-columns:repeat(4,1fr)}.tabs{grid-template-columns:repeat(4,1fr)}.controls{grid-template-columns:repeat(4,1fr)}}
+</style>
+</head>
+<body>
+<div class="app">
+<h1>🧠 Comunicador Jesús V5</h1>
+<p>Versión iPhone simple. Botones grandes, voz, frases y diario.</p>
+<div id="phrase" class="phrase">Toca botones para crear una frase</div>
+<div class="controls">
+<button class="primary" onclick="speakPhrase()">🔊 Hablar</button>
+<button onclick="clearPhrase()">🧹 Borrar</button>
+<button onclick="saveDiary()">💾 Diario</button>
+<button class="danger" onclick="setSentence('Necesito ayuda')">🆘 Ayuda</button>
+</div>
+<div class="mode">
+<button id="schoolBtn" onclick="setMode('school')">🏫 Día lectivo</button>
+<button id="freeBtn" onclick="setMode('free')">🏠 No lectivo</button>
+</div>
+<div class="tabs" id="tabs"></div>
+<div class="grid" id="grid"></div>
+<h2>⚡ Frases rápidas</h2>
+<div class="quick" id="quick"></div>
+<div class="diary"><h2>📓 Diario de hoy</h2><div id="diaryList">Aún no hay frases guardadas.</div></div>
+<p class="small">Consejo: en iPhone la voz puede activarse mejor después de tocar un botón una vez.</p>
+</div>
+<script>
+var DATA={
+ 'Predicción':[],
+ 'Personas':[['👩','Mamá'],['👨','Papá'],['👦','Diego'],['👴','Abuelo Vicente'],['👴','Abuelo Juan'],['👵','Abuela Isabel'],['👵','Abuela Rian'],['👨‍🦱','Tío Jesús'],['👤','Erik'],['👤','Carol'],['🏫','Profesor o profesora']],
+ 'Quiero':[['🍽️','Quiero comer'],['🥤','Quiero beber'],['🚽','Quiero ir al baño'],['🛌','Quiero descansar'],['📺','Quiero ver dibujos'],['🎵','Quiero música'],['🚶','Quiero salir'],['🤗','Quiero un abrazo'],['📱','Quiero la tablet'],['🛑','Quiero parar']],
+ 'Contar':[['💬','Quiero contar algo'],['👀','He visto'],['🏃','He ido'],['👍','Me ha gustado'],['👎','No me ha gustado'],['😟','Ha pasado algo'],['🎒','En el colegio'],['🚌','En el autobús'],['🏊','En la piscina'],['🏀','En baloncesto'],['🐴','Con los caballos']],
+ 'Lugares':[['🏠','Casa'],['🏫','Colegio'],['🏊','Piscina'],['🏀','Baloncesto'],['🐴','Caballos'],['🌳','Parque'],['🏥','Médico'],['🚗','Coche'],['🛒','Supermercado'],['👴','Casa de los abuelos']],
+ 'Emociones':[['😊','Estoy contento'],['😢','Estoy triste'],['😡','Estoy enfadado'],['😴','Estoy cansado'],['😰','Estoy nervioso'],['😨','Tengo miedo'],['🤗','Quiero cariño'],['😤','Estoy frustrado']],
+ 'Dolor':[['🤕','Me duele poco'],['😣','Me duele regular'],['😭','Me duele mucho'],['🧠','Me duele la cabeza'],['🦷','Me duelen los dientes'],['👄','Me duele la garganta'],['🤰','Me duele la barriga'],['🦵','Me duelen las piernas'],['💪','Me duelen los brazos'],['👂','Me duele el oído']],
+ 'Sí / No':[['✅','Sí'],['❌','No'],['🤷','No sé'],['🔁','Otra vez'],['⏳','Espera'],['✅','Vale'],['🚫','No quiero'],['➡️','Más']]
+};
+var quick=['Quiero estar con mamá','Quiero estar con papá','Quiero jugar con Diego','Necesito descansar','Me duele la cabeza','Me duele la barriga','Estoy cansado','Estoy contento','Hoy he ido al colegio','Hoy he ido a la piscina','No me gusta','Quiero contar algo de hoy'];
+var phrase=[]; var current='Predicción'; var mode=localStorage.getItem('jesus_mode')||'school';
+function speak(t){try{ if(!window.speechSynthesis){return;} speechSynthesis.cancel(); var u=new SpeechSynthesisUtterance(t); u.lang='es-ES'; u.rate=.85; u.pitch=1; speechSynthesis.speak(u);}catch(e){}}
+function update(){document.getElementById('phrase').textContent=phrase.length?phrase.join(' '):'Toca botones para crear una frase';}
+function addText(t){phrase.push(t); update(); speak(t);}
+function setSentence(t){phrase=[t]; update(); speak(t);}
+function speakPhrase(){var t=phrase.length?phrase.join(' '):'Toca botones para crear una frase'; speak(t);}
+function clearPhrase(){phrase=[]; update();}
+function pred(){var h=new Date().getHours();var d=new Date().getDay();var weekend=d===0||d===6||mode==='free'; if(weekend){return [['🏠','Casa'],['👨','Papá'],['👩','Mamá'],['👦','Diego'],['🌳','Parque'],['🛌','Quiero descansar'],['📺','Quiero ver dibujos'],['🤗','Quiero un abrazo']];} if(h<10){return [['🏫','Colegio'],['🚌','Autobús'],['🎒','Mochila'],['👩','Mamá'],['😴','Estoy cansado'],['✅','Sí'],['❌','No'],['🆘','Necesito ayuda']];} if(h<16){return [['🏫','Colegio'],['🍽️','Quiero comer'],['🏫','Profesor o profesora'],['👍','Me ha gustado'],['👎','No me ha gustado'],['🚽','Quiero ir al baño'],['😡','Estoy enfadado'],['😊','Estoy contento']];} return [['🏠','Casa'],['👦','Diego'],['😴','Estoy cansado'],['🍽️','Quiero comer'],['📱','Quiero la tablet'],['💬','Quiero contar algo'],['🤕','Me duele'],['🤗','Quiero un abrazo']];}
+function renderTabs(){var tabs=document.getElementById('tabs');tabs.innerHTML='';Object.keys(DATA).forEach(function(n){var b=document.createElement('button');b.textContent=n;b.className=n===current?'active':'';b.onclick=function(){current=n;renderAll();};tabs.appendChild(b);});}
+function renderGrid(){var grid=document.getElementById('grid');grid.innerHTML='';var items=current==='Predicción'?pred():DATA[current];items.forEach(function(x){var b=document.createElement('button');b.className='tile';b.onclick=function(){addText(x[1]);};b.innerHTML='<span class="emoji">'+x[0]+'</span><span>'+x[1]+'</span>';grid.appendChild(b);});}
+function renderQuick(){var q=document.getElementById('quick');q.innerHTML='';quick.forEach(function(s){var b=document.createElement('button');b.textContent=s;b.onclick=function(){setSentence(s);};q.appendChild(b);});}
+function saveDiary(){var txt=phrase.join(' ');if(!txt){speak('No hay frase');return;}var key='jesus_diary_'+new Date().toISOString().slice(0,10);var arr=[];try{arr=JSON.parse(localStorage.getItem(key)||'[]');}catch(e){}arr.push({time:new Date().toLocaleTimeString('es-ES',{hour:'2-digit',minute:'2-digit'}),text:txt});localStorage.setItem(key,JSON.stringify(arr));renderDiary();speak('Guardado');}
+function renderDiary(){var key='jesus_diary_'+new Date().toISOString().slice(0,10);var arr=[];try{arr=JSON.parse(localStorage.getItem(key)||'[]');}catch(e){}var dl=document.getElementById('diaryList');dl.innerHTML='';if(!arr.length){dl.textContent='Aún no hay frases guardadas.';return;}arr.slice().reverse().forEach(function(x){var d=document.createElement('div');d.className='diaryItem';d.textContent=x.time+' · '+x.text;dl.appendChild(d);});}
+function setMode(m){mode=m;localStorage.setItem('jesus_mode',m);document.getElementById('schoolBtn').className=m==='school'?'active':'';document.getElementById('freeBtn').className=m==='free'?'active':'';current='Predicción';renderAll();}
+function renderAll(){renderTabs();renderGrid();renderQuick();renderDiary();document.getElementById('schoolBtn').className=mode==='school'?'active':'';document.getElementById('freeBtn').className=mode==='free'?'active':'';}
+renderAll(); update();
+</script>
+</body>
+</html>
