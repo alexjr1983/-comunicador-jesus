@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"/>
+  <title>Comunicación Predictiva Personalizada - Jesús</title>
+  <meta name="theme-color" content="#0f766e"/>
+  <style>
+    :root{
+      --bg:#f4f7f6; --card:#ffffff; --ink:#123; --muted:#5d6b6b; --main:#0f766e; --soft:#e0f2f1; --danger:#b91c1c;
+      --shadow: 0 6px 18px rgba(0,0,0,.08);
+    }
+    *{box-sizing:border-box}
+    body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;background:var(--bg);color:var(--ink);}
+    header{position:sticky;top:0;z-index:10;background:linear-gradient(135deg,#0f766e,#115e59);color:white;padding:14px 14px 10px;box-shadow:var(--shadow)}
+    h1{margin:0;font-size:20px;line-height:1.2}
+    .sub{font-size:13px;opacity:.9;margin-top:4px}
+    main{padding:12px;max-width:900px;margin:0 auto 80px}
+    .phrase{
+      background:white;border-radius:18px;padding:14px;box-shadow:var(--shadow);margin-bottom:12px;
+      min-height:76px;border:3px solid #d1f2ee;
+    }
+    .label{font-size:13px;color:var(--muted);margin-bottom:6px}
+    #sentence{font-size:24px;font-weight:700;line-height:1.25;min-height:32px}
+    .actions{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:10px 0 12px}
+    button{
+      border:0;border-radius:16px;padding:13px 8px;font-size:17px;font-weight:700;background:var(--card);box-shadow:var(--shadow);
+      color:var(--ink);min-height:58px;
+    }
+    button:active{transform:scale(.98)}
+    .primary{background:var(--main);color:white}
+    .soft{background:var(--soft);color:#064e4b}
+    .danger{background:#fee2e2;color:var(--danger)}
+    .modebar{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px}
+    .modebar button.active{outline:4px solid #14b8a6;background:#ccfbf1}
+    .tabs{display:flex;gap:8px;overflow-x:auto;padding-bottom:8px;margin-bottom:8px}
+    .tab{white-space:nowrap;min-width:auto;padding:11px 14px;background:white}
+    .tab.active{background:#115e59;color:white}
+    .grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+    @media(min-width:720px){.grid{grid-template-columns:repeat(4,minmax(0,1fr));}}
+    .tile{background:white;border-radius:18px;padding:12px;box-shadow:var(--shadow);text-align:center;min-height:108px;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:7px}
+    .emoji{font-size:34px}
+    .txt{font-size:17px;font-weight:800}
+    .small{font-size:13px;color:var(--muted);font-weight:600}
+    .quick{margin:12px 0}
+    .quick h2,.diary h2{font-size:18px;margin:10px 0}
+    .quickgrid{display:grid;grid-template-columns:1fr;gap:8px}
+    @media(min-width:720px){.quickgrid{grid-template-columns:1fr 1fr;}}
+    .quickbtn{text-align:left;padding:14px;background:#fff7ed;color:#7c2d12}
+    .diary{background:white;border-radius:18px;padding:12px;box-shadow:var(--shadow);margin-top:12px}
+    .entry{border-top:1px solid #e5e7eb;padding:9px 0;font-size:15px}
+    .empty{color:var(--muted);font-size:14px}
+    .footerbar{position:fixed;left:0;right:0;bottom:0;background:white;padding:8px 10px;border-top:1px solid #ddd;display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+    .footerbar button{min-height:48px;font-size:15px;padding:8px}
+  </style>
+</head>
+<body>
+<header>
+  <h1>🧠 Comunicador Jesús V6</h1>
+  <div class="sub">Comunicación Predictiva Personalizada · botones grandes · voz · diario</div>
+</header>
+
+<main>
+  <section class="phrase">
+    <div class="label">Frase de Jesús</div>
+    <div id="sentence">Toca botones para crear una frase</div>
+  </section>
+
+  <div class="actions">
+    <button class="primary" onclick="speak()">🔊 Hablar</button>
+    <button class="soft" onclick="clearSentence()">🧹 Borrar</button>
+    <button class="soft" onclick="saveDiary()">💾 Guardar</button>
+    <button class="danger" onclick="emergency()">🆘 Ayuda</button>
+  </div>
+
+  <div class="modebar">
+    <button id="schoolBtn" class="active" onclick="setMode('lectivo')">🏫 Día lectivo</button>
+    <button id="homeBtn" onclick="setMode('nolectivo')">🏠 No lectivo</button>
+  </div>
+
+  <div class="tabs" id="tabs"></div>
+
+  <section class="quick">
+    <h2>⚡ Frases rápidas</h2>
+    <div class="quickgrid" id="quick"></div>
+  </section>
+
+  <section>
+    <div class="grid" id="grid"></div>
+  </section>
+
+  <section class="diary">
+    <h2>📓 Diario de hoy</h2>
+    <div id="diary"></div>
+  </section>
+</main>
+
+<div class="footerbar">
+  <button onclick="addWord('sí')">✅ Sí</button>
+  <button onclick="addWord('no')">❌ No</button>
+  <button onclick="addWord('quiero')">🙏 Quiero</button>
+</div>
+
+<script>
+const DATA = {
+  Personas: [
+    ["👩","Mamá"],["👨","Papá"],["👦","Diego"],["👴","Abuelo Vicente"],
+    ["👴","Abuelo Juan"],["👵","Abuela Isabel"],["👵","Abuela Rian"],
+    ["👨‍🦱","Tío Jesús"],["👤","Erik"],["👤","Carol"],["🏫","Profesor"]
+  ],
+  Lugares: [
+    ["🏠","casa"],["🏫","colegio"],["🏊","natación"],["🗣️","logopedia"],
+    ["🏀","baloncesto"],["👵","casa de los abuelos"],["🏥","médico"],["🚗","coche"]
+  ],
+  Actividades: [
+    ["🍽️","comer"],["💧","beber agua"],["🚽","baño"],["🛏️","descansar"],
+    ["🎮","jugar"],["📺","ver dibujos"],["🏊","ir a natación"],["🏀","jugar al baloncesto"],
+    ["📚","trabajar"],["🎵","música"]
+  ],
+  Emociones: [
+    ["😊","estoy contento"],["😢","estoy triste"],["😠","estoy enfadado"],["😴","estoy cansado"],
+    ["😰","tengo miedo"],["❤️","te quiero"],["👍","me gusta"],["👎","no me gusta"]
+  ],
+  Dolor: [
+    ["🤕","me duele"],["🦷","me duele la boca"],["👂","me duele el oído"],["🤢","me encuentro mal"],
+    ["😵","estoy mareado"],["😖","me molesta"],["🆘","necesito ayuda"],["💊","quiero medicina"]
+  ],
+  Comida: [
+    ["🥛","yogur"],["🍞","pan"],["🍌","plátano"],["🍪","galleta"],
+    ["🍝","pasta"],["🍗","pollo"],["💧","agua"],["🥤","zumo"]
+  ]
+};
+
+const QUICK = {
+  lectivo: [
+    "Hoy he ido al colegio.",
+    "He estado con mi profesor.",
+    "Quiero contar algo del colegio.",
+    "Estoy cansado.",
+    "Me duele algo.",
+    "Quiero descansar."
+  ],
+  nolectivo: [
+    "Hoy estoy en casa.",
+    "Quiero jugar.",
+    "Quiero ver dibujos.",
+    "Quiero ir con mamá.",
+    "Quiero ir con papá.",
+    "Quiero descansar."
+  ]
+};
+
+let currentCat = "Personas";
+let words = [];
+let mode = localStorage.getItem("jesus_mode") || "lectivo";
+
+function renderTabs(){
+  const tabs = document.getElementById("tabs");
+  tabs.innerHTML = "";
+  Object.keys(DATA).forEach(cat=>{
+    const b=document.createElement("button");
+    b.className="tab"+(cat===currentCat?" active":"");
+    b.textContent=cat;
+    b.onclick=()=>{currentCat=cat;renderAll();}
+    tabs.appendChild(b);
+  });
+}
+
+function renderGrid(){
+  const grid=document.getElementById("grid");
+  grid.innerHTML="";
+  DATA[currentCat].forEach(item=>{
+    const [emoji,text]=item;
+    const d=document.createElement("div");
+    d.className="tile";
+    d.onclick=()=>addWord(text);
+    d.innerHTML=`<div class="emoji">${emoji}</div><div class="txt">${text}</div><div class="small">tocar</div>`;
+    grid.appendChild(d);
+  });
+}
+
+function renderQuick(){
+  const q=document.getElementById("quick");
+  q.innerHTML="";
+  QUICK[mode].forEach(text=>{
+    const b=document.createElement("button");
+    b.className="quickbtn";
+    b.textContent=text;
+    b.onclick=()=>setSentence(text);
+    q.appendChild(b);
+  });
+}
+
+function renderMode(){
+  document.getElementById("schoolBtn").classList.toggle("active", mode==="lectivo");
+  document.getElementById("homeBtn").classList.toggle("active", mode==="nolectivo");
+}
+
+function setMode(m){
+  mode=m;
+  localStorage.setItem("jesus_mode",m);
+  renderAll();
+}
+
+function addWord(w){
+  if(words.length===0 && document.getElementById("sentence").textContent==="Toca botones para crear una frase") words=[];
+  words.push(w);
+  updateSentence();
+}
+
+function setSentence(t){
+  words=[t];
+  updateSentence();
+}
+
+function updateSentence(){
+  const s = words.join(" ");
+  document.getElementById("sentence").textContent = s || "Toca botones para crear una frase";
+}
+
+function clearSentence(){
+  words=[];
+  updateSentence();
+}
+
+function speak(){
+  const text=document.getElementById("sentence").textContent;
+  if(!text || text==="Toca botones para crear una frase") return;
+  try{
+    speechSynthesis.cancel();
+    const u=new SpeechSynthesisUtterance(text);
+    u.lang="es-ES";
+    u.rate=0.9;
+    speechSynthesis.speak(u);
+  }catch(e){
+    alert("La voz no está disponible en este navegador.");
+  }
+}
+
+function saveDiary(){
+  const text=document.getElementById("sentence").textContent;
+  if(!text || text==="Toca botones para crear una frase") return;
+  const diary=JSON.parse(localStorage.getItem("jesus_diary")||"[]");
+  diary.unshift({text, time:new Date().toLocaleString("es-ES")});
+  localStorage.setItem("jesus_diary",JSON.stringify(diary.slice(0,50)));
+  renderDiary();
+}
+
+function renderDiary(){
+  const box=document.getElementById("diary");
+  const diary=JSON.parse(localStorage.getItem("jesus_diary")||"[]");
+  if(!diary.length){box.innerHTML='<div class="empty">Aún no hay frases guardadas.</div>';return;}
+  box.innerHTML=diary.map(e=>`<div class="entry"><b>${e.text}</b><br><span class="small">${e.time}</span></div>`).join("");
+}
+
+function emergency(){
+  setSentence("Necesito ayuda. Me pasa algo.");
+  speak();
+}
+
+function renderAll(){
+  renderMode(); renderTabs(); renderQuick(); renderGrid(); renderDiary();
+}
+renderAll();
+</script>
+</body>
+</html>
