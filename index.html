@@ -47,37 +47,7 @@ main{margin-bottom:82px}
 let sentence="", screen="home";
 const quick=["Quiero beber agua.","Quiero comer yogur.","Quiero descansar.","Estoy cansado.","Me duele algo.","Quiero ir con mamá."];
 
-const screens={
-home:["Inicio",[
-["🙏","Quiero algo","quiero","main"],["😊","Cómo estoy","estado","emotion"],["👥","He estado con","personas","main"],["📍","He ido a","lugares","main"],["🤕","Me duele","dolor","pain"],["🤖","Hablar con mi amigo","avatar","main"]
-]],
-quiero:["Quiero...",[
-["🍽️","Comer","comer","food"],["💧","Beber","beber","main"],["🛏️","Descansar","final:Quiero descansar.","main"],["🎮","Jugar","final:Quiero jugar.","main"],["👩","Mamá","final:Quiero ir con mamá.","main"],["👨","Papá","final:Quiero ir con papá.","main"],["👦","Diego","final:Quiero estar con Diego.","main"],["🚽","Baño","final:Quiero ir al baño.","main"],["⬅️","Volver","home",""]
-]],
-comer:["Quiero comer...",[
-["🥛","Yogur","final:Quiero comer yogur.","food"],["🍌","Plátano","final:Quiero comer plátano.","food"],["🍪","Galleta","final:Quiero comer galleta.","food"],["🍝","Pasta","final:Quiero comer pasta.","food"],["🍗","Pollo","final:Quiero comer pollo.","food"],["🍞","Pan","final:Quiero comer pan.","food"],["🥣","Puré","final:Quiero comer puré.","food"],["🍎","Fruta","final:Quiero comer fruta.","food"],["⬅️","Volver","quiero",""]
-]],
-beber:["Quiero beber...",[
-["💧","Agua","final:Quiero beber agua.","main"],["🥤","Zumo","final:Quiero beber zumo.","main"],["🥛","Leche","final:Quiero beber leche.","main"],["⬅️","Volver","quiero",""]
-]],
-estado:["Estoy...",[
-["😊","Contento","final:Estoy contento.","emotion"],["😐","Normal","final:Estoy normal.","emotion"],["😢","Triste","final:Estoy triste.","emotion"],["😠","Enfadado","final:Estoy enfadado.","emotion"],["😴","Cansado","final:Estoy cansado.","emotion"],["😰","Nervioso","final:Estoy nervioso.","emotion"],["❤️","Te quiero","final:Te quiero.","emotion"],["⬅️","Volver","home",""]
-]],
-personas:["He estado con...",[
-["👩","Mamá","final:He estado con mamá.","main"],["👨","Papá","final:He estado con papá.","main"],["👦","Diego","final:He estado con Diego.","main"],["👤","Erik","final:He estado con Erik.","main"],["👤","Carol","final:He estado con Carol.","main"],["🏫","Profesor","final:He estado con mi profesor.","main"],["👴","Abuelo Vicente","final:He estado con el abuelo Vicente.","main"],["👵","Abuela Isabel","final:He estado con la abuela Isabel.","main"],["⬅️","Volver","home",""]
-]],
-lugares:["He ido a...",[
-["🏫","Colegio","final:Hoy he ido al colegio.","main"],["🏊","Natación","final:Hoy he ido a natación.","main"],["🗣️","Logopedia","final:Hoy he ido a logopedia.","main"],["🏀","Baloncesto","final:Hoy he ido a baloncesto.","main"],["🏠","Casa","final:Hoy he estado en casa.","main"],["👵","Abuelos","final:Hoy he ido a casa de los abuelos.","main"],["🏥","Médico","final:Hoy he ido al médico.","main"],["⬅️","Volver","home",""]
-]],
-dolor:["Me duele...",[
-["🤕","Algo","final:Me duele algo.","pain"],["🦷","Boca","final:Me duele la boca.","pain"],["👂","Oído","final:Me duele el oído.","pain"],["🤢","Barriga","final:Me duele la barriga.","pain"],["🦵","Pierna","final:Me duele la pierna.","pain"],["😵","Mareado","final:Estoy mareado.","pain"],["💊","Medicina","final:Necesito medicina.","pain"],["⬅️","Volver","home",""]
-]],
-avatar:["🤖 Mi amigo",[
-["👋","Hola","final:Hola amigo.","main"],["😊","Estoy contento","final:Estoy contento.","emotion"],["😴","Estoy cansado","final:Estoy cansado.","emotion"],["🏫","Colegio","final:Hoy he ido al colegio.","main"],["🏊","Natación","final:Hoy he ido a natación.","main"],["👦","Diego","final:He estado con Diego.","main"],["⬅️","Volver","home",""]
-]]
-};
 
-function render(){
  const [path,items]=screens[screen]; document.getElementById("path").textContent=path;
  const grid=document.getElementById("grid"); grid.innerHTML="";
  items.forEach(([e,t,a,c])=>{
